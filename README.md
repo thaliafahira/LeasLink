@@ -1,39 +1,104 @@
-# LEASLINK
+# LeasLink - Vehicle Financing Management System
 
-## 📌 Deskripsi Singkat
-Aplikasi desktop berbasis Java dengan paradigma OOP yang digunakan untuk mengelola:
-- Data kontrak
-- Transaksi pelanggan
-- Aging piutang (penagihan berdasarkan jatuh tempo)
+LeasLink is a desktop application designed to support PT Mitra's operational activities in managing vehicle financing receivables and payments. The system provides features for recording financing contracts, automating payment recording and reconciliation, providing loan status information, and generating real-time aging receivables reports.
 
-Terdapat tiga jenis pengguna: Admin, Staff, dan Customer, dengan hak akses yang berbeda.
+## Features
 
----
+- User Authentication (Login/Register)
+- Contract Management
+- Payment Processing
+- Loan Status Tracking
+- Real-time Aging Reports
+- User Role Management (Admin/Customer)
 
-## ▶️ Cara Menjalankan Aplikasi
+## Technical Stack
 
-1. Buka IDE seperti IntelliJ atau VS Code
-2. Buka folder `src/` dan jalankan class `Main.java`
-3. Pastikan Java SDK sudah diinstall (versi minimal: Java 8)
+- Language: Java 21
+- Build Tool: Maven
+- Database: SQLite
+- UI Framework: Java Swing
+- Testing Framework: JUnit 5
 
----
+## Prerequisites
 
-## 🔧 Modul yang Diimplementasikan
+- Java Development Kit (JDK) 17 or higher
+- Maven 3.6 or higher
+- Git (optional, for version control)
 
-| Modul           | Deskripsi                            | PIC           | Screenshot |
-|----------------|--------------------------------------|----------------|------------|
-| Login/Signup    | Autentikasi multi-role pengguna       | Thalia         | ![img](doc/login.png) |
-| Kontrak         | Melihat & menambah data kontrak       | [Nama]         | ![img](doc/kontrak.png) |
-| Transaksi       | Melihat riwayat transaksi pengguna    | [Nama]         | ![img](doc/transaksi.png) |
-| Aging Piutang   | Laporan umur piutang per user         | [Nama]         | ![img](doc/aging.png) |
+## Setup Instructions
 
----
+1. Clone the repository (if using Git):
 
-## 🗃️ Tabel Basis Data
+   ```bash
+   git clone https://github.com/yourusername/leaslink.git
+   cd leaslink
+   ```
 
-| Tabel         | Atribut                                   |
-|---------------|--------------------------------------------|
-| users         | id, username, password, role              |
-| kontrak       | id_kontrak, user_id, nama_proyek, tanggal |
-| transaksi     | id_transaksi, user_id, jumlah, tanggal    |
-| piutang       | id_piutang, user_id, jumlah, due_date     |
+2. Build the project using Maven:
+
+   ```bash
+   mvn clean package
+   ```
+
+3. Run the application:
+   ```bash
+   java -jar target/leaslink-1.0-SNAPSHOT-jar-with-dependencies.jar
+   ```
+
+## Project Structure
+
+```
+leaslink/
+├── src/
+│   └── main/
+│       └── java/
+│           └── com/
+│               └── leaslink/
+│                   ├── controllers/    # Business logic
+│                   ├── models/         # Data models
+│                   ├── utils/          # Utility classes
+│                   └── views/          # UI components
+├── tests/                             # Test cases
+├── doc/                               # Documentation and screenshots
+├── img/                              # Image assets
+├── pom.xml                           # Maven configuration
+└── README.md                         # This file
+```
+
+## Implemented Modules
+
+### 1. Authentication Module
+
+- **Description**: Handles user registration and login
+- **Features**:
+  - User registration with email validation
+  - Secure password handling
+  - Role-based access control (Admin/Customer)
+- **Screenshots**: [To be added in doc/ directory]
+
+### 2. Database Schema
+
+#### Users Table
+
+| Column     | Type      | Description                 |
+| ---------- | --------- | --------------------------- |
+| id         | INTEGER   | Primary key, auto-increment |
+| email      | TEXT      | Unique user email           |
+| password   | TEXT      | Hashed password             |
+| full_name  | TEXT      | User's full name            |
+| role       | TEXT      | User role (Admin/Customer)  |
+| created_at | TIMESTAMP | Account creation timestamp  |
+
+[Additional tables will be added as more modules are implemented]
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is proprietary software owned by PT Mitra. All rights reserved.
