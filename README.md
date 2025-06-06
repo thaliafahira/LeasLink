@@ -42,7 +42,7 @@ LeasLink is a desktop application designed to support PT Mitra's operational act
 
 3. Run the application:
    ```bash
-   java -jar target/leaslink-1.0-SNAPSHOT-jar-with-dependencies.jar
+   java -jar target/leaslink.jar
    ```
 
 ## Project Structure
