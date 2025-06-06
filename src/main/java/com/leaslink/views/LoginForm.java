@@ -475,11 +475,11 @@ public class LoginForm extends JFrame {
             User user = AuthController.login(email, password);
             if (user != null) {
                 // Check if user role matches selected mode
-                if (isLoginAsStaff && user.getRole().equals("staff")) {
-                    showError("Akun customer tidak dapat masuk sebagai staff");
+                if (isLoginAsStaff && user.getRole().equals("customer")) {
+                    showError("Tidak dapat masuk sebagai staff");
                     return;
-                } else if (!isLoginAsStaff && !user.getRole().equals("staff")) {
-                    showError("Akun staff tidak dapat masuk sebagai customer");
+                } else if (!isLoginAsStaff && !user.getRole().equals("customer")) {
+                    showError("Tidak dapat masuk sebagai customer");
                     return;
                 }
                 

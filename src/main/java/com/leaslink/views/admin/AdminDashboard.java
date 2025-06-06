@@ -6,8 +6,6 @@ import com.leaslink.views.LoginForm;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class AdminDashboard extends JFrame {
     private User currentUser;
