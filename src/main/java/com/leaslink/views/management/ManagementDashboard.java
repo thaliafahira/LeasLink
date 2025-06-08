@@ -2,6 +2,7 @@ package com.leaslink.views.management;
 
 import com.leaslink.models.User;
 import com.leaslink.views.LoginForm;
+import com.leaslink.views.common.AgingReceivablesPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -48,6 +49,7 @@ public class ManagementDashboard extends JFrame {
         contentPanel.add(createCustomersPanel(), "customers");
         contentPanel.add(createFinancePanel(), "finance");
         contentPanel.add(createReportsPanel(), "reports");
+        contentPanel.add(new AgingReceivablesPanel(currentUser, true), "aging");
 
         add(contentPanel, BorderLayout.CENTER);
     }
@@ -96,14 +98,14 @@ public class ManagementDashboard extends JFrame {
         sidebar.setPreferredSize(new Dimension(250, 0));
         sidebar.setBorder(new EmptyBorder(20, 0, 20, 0));
 
-        // Menu items for management
+        // Fixed: Menu items and keys arrays now match
         String[] menuItems = {
             "Dashboard", "Penjualan", "Inventori", 
-            "Pelanggan", "Keuangan", "Laporan"
+            "Pelanggan", "Keuangan", "Laporan", "Aging Piutang"
         };
         String[] menuKeys = {
             "dashboard", "sales", "inventory", 
-            "customers", "finance", "reports"
+            "customers", "finance", "reports", "aging"
         };
 
         for (int i = 0; i < menuItems.length; i++) {

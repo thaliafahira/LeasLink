@@ -2,6 +2,7 @@ package com.leaslink.views.admin;
 
 import com.leaslink.models.User;
 import com.leaslink.views.LoginForm;
+import com.leaslink.views.common.AgingReceivablesPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -46,6 +47,7 @@ public class AdminDashboard extends JFrame {
         contentPanel.add(createUserManagementPanel(), "users");
         contentPanel.add(createMotorcycleManagementPanel(), "motorcycles");
         contentPanel.add(createLeaseManagementPanel(), "leases");
+        contentPanel.add(new AgingReceivablesPanel(currentUser, false), "aging"); // Add aging panel
         contentPanel.add(createReportsPanel(), "reports");
         contentPanel.add(createSettingsPanel(), "settings");
 
@@ -96,14 +98,14 @@ public class AdminDashboard extends JFrame {
         sidebar.setPreferredSize(new Dimension(250, 0));
         sidebar.setBorder(new EmptyBorder(20, 0, 20, 0));
 
-        // Menu items
+        // Menu items - Updated to include Aging Piutang
         String[] menuItems = {
             "Dashboard", "Manajemen User", "Manajemen Motor", 
-            "Manajemen Lease", "Laporan", "Pengaturan"
+            "Manajemen Lease", "Aging Piutang", "Laporan", "Pengaturan"
         };
         String[] menuKeys = {
             "dashboard", "users", "motorcycles", 
-            "leases", "reports", "settings"
+            "leases", "aging", "reports", "settings"
         };
 
         for (int i = 0; i < menuItems.length; i++) {
