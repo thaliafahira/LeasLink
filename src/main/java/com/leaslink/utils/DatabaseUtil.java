@@ -59,9 +59,7 @@ public class DatabaseUtil {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """;
-
-        // Create leases table
+        """;        // Create leases table
         String createLeasesTable = """
             CREATE TABLE IF NOT EXISTS leases (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,7 +70,7 @@ public class DatabaseUtil {
                 lease_duration INTEGER NOT NULL, -- in months
                 start_date DATE NOT NULL,
                 end_date DATE NOT NULL,
-                status TEXT CHECK(status IN ('active', 'completed', 'defaulted')) DEFAULT 'active',
+                status TEXT CHECK(status IN ('pending', 'active', 'completed', 'cancelled', 'rejected')) DEFAULT 'pending',
                 created_by INTEGER NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -80,9 +78,7 @@ public class DatabaseUtil {
                 FOREIGN KEY (motorcycle_id) REFERENCES motorcycles(id),
                 FOREIGN KEY (created_by) REFERENCES users(id)
             )
-        """;
-
-        // Create payments table
+        """;        // Create payments table
         String createPaymentsTable = """
             CREATE TABLE IF NOT EXISTS payments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -98,19 +94,35 @@ public class DatabaseUtil {
             )
         """;
 
-        try (Statement stmt = connection.createStatement()) {
+        // Create lease audit log table
+        String createLeaseAuditLogTable = """
+            CREATE TABLE IF NOT EXISTS lease_audit_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                lease_id INTEGER NOT NULL,
+                action TEXT NOT NULL,
+                user_id INTEGER NOT NULL,
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (lease_id) REFERENCES leases(id),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """;        try (Statement stmt = connection.createStatement()) {
             // Create all tables
             stmt.execute(createUsersTable);
             stmt.execute(createUpdateTrigger);
             stmt.execute(createMotorcyclesTable);
             stmt.execute(createLeasesTable);
             stmt.execute(createPaymentsTable);
+            stmt.execute(createLeaseAuditLogTable);
             
             // Create default users if not exists
             createDefaultUsers(stmt);
             
             // Create sample motorcycles if not exists
             createSampleMotorcycles(stmt);
+            
+            // Create sample leases and payments if not exists
+            createSampleLeasesAndPayments(stmt);
         }
     }
 
@@ -177,9 +189,7 @@ public class DatabaseUtil {
             System.out.println("Collector: collector@leaslink.com / collector");
             System.out.println("Customer: customer@leaslink.com / customer");
         }
-    }
-
-    private static void createSampleMotorcycles(Statement stmt) throws SQLException {
+    }    private static void createSampleMotorcycles(Statement stmt) throws SQLException {
         // Check if any motorcycles exist
         ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM motorcycles");
         if (rs.next() && rs.getInt(1) == 0) {
@@ -199,6 +209,52 @@ public class DatabaseUtil {
             }
             
             System.out.println("Sample motorcycles created successfully.");
+        }
+    }
+
+    private static void createSampleLeasesAndPayments(Statement stmt) throws SQLException {
+        // Check if any leases exist
+        ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM leases");
+        if (rs.next() && rs.getInt(1) == 0) {
+            // Create sample leases for the customer (assuming customer ID is 4)
+            String[] sampleLeases = {
+                // Lease 1: Honda Vario 125 (motorcycle_id=1, customer_id=4, created_by=2)
+                "INSERT INTO leases (customer_id, motorcycle_id, lease_amount, monthly_payment, lease_duration, start_date, end_date, status, created_by) VALUES (4, 1, 18500000, 1200000, 18, '2023-01-15', '2024-07-15', 'active', 2)",
+                
+                // Lease 2: Yamaha NMAX 155 (motorcycle_id=3, customer_id=4, created_by=2)
+                "INSERT INTO leases (customer_id, motorcycle_id, lease_amount, monthly_payment, lease_duration, start_date, end_date, status, created_by) VALUES (4, 3, 28500000, 1800000, 20, '2023-06-01', '2025-02-01', 'active', 2)"
+            };
+            
+            for (String sql : sampleLeases) {
+                stmt.execute(sql);
+            }
+            
+            // Create sample payments for these leases
+            String[] samplePayments = {
+                // Payments for Lease 1 (Honda Vario 125) - 8 months paid
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (1, '2023-01-15', 1200000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 1')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (1, '2023-02-15', 1200000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 2')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (1, '2023-03-15', 1200000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 3')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (1, '2023-04-15', 1200000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 4')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (1, '2023-05-15', 1200000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 5')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (1, '2023-06-15', 1200000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 6')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (1, '2023-07-15', 1200000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 7')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (1, '2023-08-15', 1200000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 8')",
+                
+                // Payments for Lease 2 (Yamaha NMAX 155) - 6 months paid
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (2, '2023-06-01', 1800000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 1')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (2, '2023-07-01', 1800000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 2')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (2, '2023-08-01', 1800000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 3')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (2, '2023-09-01', 1800000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 4')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (2, '2023-10-01', 1800000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 5')",
+                "INSERT INTO payments (lease_id, payment_date, amount, payment_method, collector_id, notes) VALUES (2, '2023-11-01', 1800000, 'Transfer Bank', 3, 'Pembayaran cicilan bulan 6')"
+            };
+            
+            for (String sql : samplePayments) {
+                stmt.execute(sql);
+            }
+            
+            System.out.println("Sample leases and payments created successfully.");
         }
     }
 

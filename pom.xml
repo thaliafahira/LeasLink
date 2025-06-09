@@ -53,6 +53,14 @@
                     <target>21</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
+            </plugin>            <!-- Exec Maven Plugin for Running -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <mainClass>com.leaslink.Main</mainClass>
+                </configuration>
             </plugin>
 
             <!-- Maven Shade Plugin for Executable JAR -->
