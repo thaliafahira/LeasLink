@@ -6,6 +6,7 @@ import com.leaslink.models.User;
 import com.leaslink.views.admin.AdminDashboard;
 import com.leaslink.views.management.ManagementDashboard;
 import com.leaslink.views.collector.CollectorDashboard;
+import com.leaslink.views.customer.CustomerDashboard;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -505,13 +506,8 @@ public class LoginForm extends JFrame {
                     break;
                 case "collector":
                     new CollectorDashboard(user).setVisible(true);
-                    break;
-                case "customer":
-                    // For now, show a simple message for customers
-                    JOptionPane.showMessageDialog(this, 
-                        "Customer dashboard belum tersedia.\nFitur ini akan segera hadir!", 
-                        "Info", 
-                        JOptionPane.INFORMATION_MESSAGE);
+                    break;                case "customer":
+                    new CustomerDashboard(user).setVisible(true);
                     break;
                 default:
                     showError("Role tidak dikenali: " + user.getRole());

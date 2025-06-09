@@ -207,10 +207,8 @@ public class AdminDashboard extends JFrame {
 
     private JPanel createMotorcycleManagementPanel() {
         return createPlaceholderPanel("Manajemen Motor", "Kelola data motor dan inventori");
-    }
-
-    private JPanel createLeaseManagementPanel() {
-        return createPlaceholderPanel("Manajemen Lease", "Kelola kontrak leasing dan pembayaran");
+    }    private JPanel createLeaseManagementPanel() {
+        return new LeaseManagementPanel(currentUser);
     }
 
     private JPanel createReportsPanel() {
