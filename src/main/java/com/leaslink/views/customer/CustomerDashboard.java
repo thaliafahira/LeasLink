@@ -72,7 +72,7 @@ public class CustomerDashboard extends JFrame {
 
     private JPanel createNavbar() {
         JPanel navbar = new JPanel(new BorderLayout());
-        navbar.setBackground(new Color(0, 123, 255)); // Blue theme for customer
+        navbar.setBackground(new Color(255, 0, 0)); 
         navbar.setPreferredSize(new Dimension(0, 60));
         navbar.setBorder(new EmptyBorder(10, 20, 10, 20));
 

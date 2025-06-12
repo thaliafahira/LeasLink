@@ -87,6 +87,7 @@ public class Main {
         System.out.println("Admin     : admin@leaslink.com / admin");
         System.out.println("Manager   : manager@leaslink.com / management");
         System.out.println("Collector : collector@leaslink.com / collector");
+        System.out.println("Customer : customer@leaslink.com / customer");
         System.out.println("=".repeat(50) + "\n");
     }
 }

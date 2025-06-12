@@ -56,7 +56,7 @@ public class ManagementDashboard extends JFrame {
 
     private JPanel createNavbar() {
         JPanel navbar = new JPanel(new BorderLayout());
-        navbar.setBackground(new Color(40, 167, 69)); // Green theme for management
+        navbar.setBackground(new Color(255, 0, 0)); // Green theme for management
         navbar.setPreferredSize(new Dimension(0, 60));
         navbar.setBorder(new EmptyBorder(10, 20, 10, 20));
 

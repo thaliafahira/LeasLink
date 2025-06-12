@@ -54,7 +54,7 @@ public class CollectorDashboard extends JFrame {
 
     private JPanel createNavbar() {
         JPanel navbar = new JPanel(new BorderLayout());
-        navbar.setBackground(new Color(255, 193, 7)); // Yellow theme for collector
+        navbar.setBackground(new Color(255, 0, 0)); // Yellow theme for collector
         navbar.setPreferredSize(new Dimension(0, 60));
         navbar.setBorder(new EmptyBorder(10, 20, 10, 20));
 

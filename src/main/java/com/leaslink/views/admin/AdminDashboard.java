@@ -58,7 +58,7 @@ public class AdminDashboard extends JFrame {
 
     private JPanel createNavbar() {
         JPanel navbar = new JPanel(new BorderLayout());
-        navbar.setBackground(new Color(220, 53, 69));
+        navbar.setBackground(new Color(255, 0, 0));
         navbar.setPreferredSize(new Dimension(0, 60));
         navbar.setBorder(new EmptyBorder(10, 20, 10, 20));
 
