@@ -1,5 +1,6 @@
 com\leaslink\views\common\AgingReceivablesPanel$1.class
 com\leaslink\views\LoginForm$5.class
+com\leaslink\views\common\ContractFinancingPanel.class
 com\leaslink\controllers\AgingController.class
 com\leaslink\models\AgingData.class
 com\leaslink\views\RegisterForm$2.class
@@ -43,7 +44,9 @@ com\leaslink\views\admin\LeaseFormDialog.class
 com\leaslink\views\collector\CollectorDashboard.class
 com\leaslink\views\common\AgingReceivablesPanel$ButtonEditor.class
 com\leaslink\views\LoginForm$4.class
+com\leaslink\models\FinancingContract.class
 com\leaslink\views\admin\LeaseManagementPanel$1.class
+com\leaslink\controllers\ContractController.class
 com\leaslink\controllers\AgingController$AgingSummary.class
 com\leaslink\views\LoginForm.class
 com\leaslink\views\customer\CustomerDashboard$2.class

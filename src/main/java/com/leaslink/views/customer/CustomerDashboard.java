@@ -90,7 +90,7 @@ public class CustomerDashboard extends JFrame {
         userLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         
         JButton logoutButton = new JButton("Logout");
-        logoutButton.setBackground(new Color(0, 86, 179));
+        logoutButton.setBackground(new Color(128, 35, 51));
         logoutButton.setForeground(Color.WHITE);
         logoutButton.setBorderPainted(false);
         logoutButton.setFocusPainted(false);

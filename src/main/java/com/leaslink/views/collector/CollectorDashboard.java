@@ -72,7 +72,7 @@ public class CollectorDashboard extends JFrame {
         userLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         
         JButton logoutButton = new JButton("Logout");
-        logoutButton.setBackground(new Color(255, 171, 0));
+        logoutButton.setBackground(new Color(128, 35, 51));
         logoutButton.setForeground(new Color(52, 58, 64));
         logoutButton.setBorderPainted(false);
         logoutButton.setFocusPainted(false);

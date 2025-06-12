@@ -40,7 +40,7 @@ public class ManagementDashboard extends JFrame {
         // Create main content area
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
-        contentPanel.setBackground(new Color(248, 249, 250));
+        contentPanel.setBackground(new Color(128, 35, 51));
         
         // Add different panels for each menu
         contentPanel.add(createDashboardPanel(), "dashboard");
