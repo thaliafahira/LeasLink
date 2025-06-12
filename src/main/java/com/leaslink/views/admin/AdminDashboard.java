@@ -102,11 +102,11 @@ public class AdminDashboard extends JFrame {
 
         String[] menuItems = {
             "Dashboard", "Manajemen User", "Manajemen Motor", 
-            "Manajemen Lease", "Kontrak Pembiayaan", "Aging Piutang", "Laporan", "Pengaturan"
+            "Manajemen Lease", "Kontrak Pembiayaan", "Aging Piutang",
         };
         String[] menuKeys = {
             "dashboard", "users", "motorcycles", 
-            "leases", "contracts", "aging", "reports", "settings"
+            "leases", "contracts", "aging",
         };
 
         for (int i = 0; i < menuItems.length; i++) {

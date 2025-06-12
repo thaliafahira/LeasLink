@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.util.Map;
+import java.util.HashMap;
 import com.leaslink.models.FinancingContract;
 
 public class DatabaseUtil {
@@ -123,6 +124,7 @@ public class DatabaseUtil {
             CREATE TABLE IF NOT EXISTS financing_contract (
                 contract_id TEXT PRIMARY KEY,
                 debtor_nik TEXT NOT NULL,
+                debtor_name TEXT NOT NULL,
                 loan_amount DECIMAL(15,2) NOT NULL,
                 interest_rate DECIMAL(5,2) NOT NULL,
                 term INTEGER NOT NULL,
@@ -152,6 +154,9 @@ public class DatabaseUtil {
             
             // Create sample leases and payments if not exists
             createSampleLeasesAndPayments(stmt);
+            
+            // Create sample financing contracts if not exists
+            createSampleFinancingContracts(stmt);
         }
     }
 
@@ -289,10 +294,33 @@ public class DatabaseUtil {
         }
     }
 
+    private static void createSampleFinancingContracts(Statement stmt) throws SQLException {
+        // Check if any financing contracts exist
+        ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM financing_contract");
+        if (rs.next() && rs.getInt(1) == 0) {
+            String[] sampleContracts = {
+                "INSERT INTO financing_contract (contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status) VALUES ('ABC123EDF', '1234567890123456', 'Budi Setiabudi', 50000000, 6.5, 36, '2024-01-01', '2027-01-01', 'Aktif')",
+                "INSERT INTO financing_contract (contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status) VALUES ('DEF456GHI', '1234567890123456', 'Budi Setiabudi', 35000000, 7.2, 24, '2023-10-01', '2025-10-01', 'Aktif')",
+                "INSERT INTO financing_contract (contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status) VALUES ('GHI789JKL', '1234567890123456', 'Budi Setiabudi', 60000000, 5.8, 48, '2022-05-15', '2026-05-15', 'Selesai')",
+                "INSERT INTO financing_contract (contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status) VALUES ('JKL012MNO', '9876543210987654', 'Siti Rahayu', 45000000, 6.0, 36, '2023-06-01', '2026-06-01', 'Aktif')",
+                "INSERT INTO financing_contract (contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status) VALUES ('MNO345PQR', '9876543210987654', 'Siti Rahayu', 30000000, 7.5, 18, '2022-03-01', '2023-09-01', 'Selesai')",
+                "INSERT INTO financing_contract (contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status) VALUES ('PQR678STU', '1122334455667788', 'Ahmad Wahyudi', 25000000, 6.2, 12, '2024-01-15', '2025-01-15', 'Aktif')",
+                "INSERT INTO financing_contract (contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status) VALUES ('STU901VWX', '1122334455667788', 'Ahmad Wahyudi', 70000000, 8.0, 60, '2021-08-01', '2026-08-01', 'Menunggak')",
+                "INSERT INTO financing_contract (contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status) VALUES ('VWX234YZA', '5555666677778888', 'Rina Wati', 20000000, 6.8, 12, '2024-02-01', '2025-02-01', 'Aktif')"
+            };
+            
+            for (String sql : sampleContracts) {
+                stmt.execute(sql);
+            }
+            
+            System.out.println("Sample financing contracts created successfully.");
+        }
+    }
+
     // Contract financing methods
     public static List<FinancingContract> getContractsByDebtorNik(String nik) {
         List<FinancingContract> contracts = new ArrayList<>();
-        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
+        String query = "SELECT contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status " +
                       "FROM financing_contract WHERE debtor_nik = ?";
 
         try (Connection conn = getConnection();
@@ -312,6 +340,7 @@ public class DatabaseUtil {
                 FinancingContract contract = new FinancingContract(
                     rs.getString("contract_id"),
                     rs.getString("debtor_nik"),
+                    rs.getString("debtor_name"),
                     rs.getDouble("loan_amount"),
                     rs.getDouble("interest_rate"),
                     rs.getInt("term"),
@@ -331,13 +360,14 @@ public class DatabaseUtil {
 
     public static List<FinancingContract> searchContractsByNik(String keyword) {
         List<FinancingContract> contracts = new ArrayList<>();
-        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
-                      "FROM financing_contract WHERE debtor_nik LIKE ?";
+        String query = "SELECT contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status " +
+                      "FROM financing_contract WHERE debtor_nik LIKE ? OR debtor_name LIKE ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, "%" + keyword + "%");
+            stmt.setString(2, "%" + keyword + "%");
             ResultSet rs = stmt.executeQuery();
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -346,6 +376,7 @@ public class DatabaseUtil {
                 contracts.add(new FinancingContract(
                     rs.getString("contract_id"),
                     rs.getString("debtor_nik"),
+                    rs.getString("debtor_name"),
                     rs.getDouble("loan_amount"),
                     rs.getDouble("interest_rate"),
                     rs.getInt("term"),
@@ -364,8 +395,8 @@ public class DatabaseUtil {
     
     public static List<FinancingContract> getAllContracts() {
         List<FinancingContract> contracts = new ArrayList<>();
-        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
-                      "FROM financing_contract";
+        String query = "SELECT contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status " +
+                      "FROM financing_contract ORDER BY created_at DESC";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -377,6 +408,7 @@ public class DatabaseUtil {
                 contracts.add(new FinancingContract(
                     rs.getString("contract_id"),
                     rs.getString("debtor_nik"),
+                    rs.getString("debtor_name"),
                     rs.getDouble("loan_amount"),
                     rs.getDouble("interest_rate"),
                     rs.getInt("term"),
@@ -392,6 +424,142 @@ public class DatabaseUtil {
 
         return contracts;
     }
+
+    public static FinancingContract getContractById(String contractId) {
+        String query = "SELECT contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status " +
+                      "FROM financing_contract WHERE contract_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, contractId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                return new FinancingContract(
+                    rs.getString("contract_id"),
+                    rs.getString("debtor_nik"),
+                    rs.getString("debtor_name"),
+                    rs.getDouble("loan_amount"),
+                    rs.getDouble("interest_rate"),
+                    rs.getInt("term"),
+                    sdf.parse(rs.getString("start_date")),
+                    sdf.parse(rs.getString("due_date")),
+                    rs.getString("status")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    // Add these methods to your DatabaseUtil class
+
+/**
+ * Get contracts by status
+ */
+public static List<FinancingContract> getContractsByStatus(String status) {
+    List<FinancingContract> contracts = new ArrayList<>();
+    String query = "SELECT contract_id, debtor_nik, debtor_name, loan_amount, interest_rate, term, start_date, due_date, status " +
+                  "FROM financing_contract WHERE status = ? ORDER BY created_at DESC";
+
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+        stmt.setString(1, status);
+        ResultSet rs = stmt.executeQuery();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        while (rs.next()) {
+            contracts.add(new FinancingContract(
+                rs.getString("contract_id"),
+                rs.getString("debtor_nik"),
+                rs.getString("debtor_name"),
+                rs.getDouble("loan_amount"),
+                rs.getDouble("interest_rate"),
+                rs.getInt("term"),
+                sdf.parse(rs.getString("start_date")),
+                sdf.parse(rs.getString("due_date")),
+                rs.getString("status")
+            ));
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return contracts;
+}
+
+/**
+ * Update contract status
+ */
+public static boolean updateContractStatus(String contractId, String newStatus) {
+    String query = "UPDATE financing_contract SET status = ? WHERE contract_id = ?";
+    
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+        
+        stmt.setString(1, newStatus);
+        stmt.setString(2, contractId);
+        
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+/**
+ * Get contracts statistics
+ */
+public static Map<String, Integer> getContractStatistics() {
+    Map<String, Integer> stats = new HashMap<>();
+    String query = "SELECT status, COUNT(*) as count FROM financing_contract GROUP BY status";
+    
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query);
+         ResultSet rs = stmt.executeQuery()) {
+        
+        while (rs.next()) {
+            stats.put(rs.getString("status"), rs.getInt("count"));
+        }
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    
+    return stats;
+}
+
+/**
+ * Get total loan amount by status
+ */
+public static Map<String, Double> getTotalAmountByStatus() {
+    Map<String, Double> amounts = new HashMap<>();
+    String query = "SELECT status, SUM(loan_amount) as total FROM financing_contract GROUP BY status";
+    
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query);
+         ResultSet rs = stmt.executeQuery()) {
+        
+        while (rs.next()) {
+            amounts.put(rs.getString("status"), rs.getDouble("total"));
+        }
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    
+    return amounts;
+}
 
     public static void closeConnection() {
         try {
