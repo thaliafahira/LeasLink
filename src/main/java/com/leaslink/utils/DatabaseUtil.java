@@ -1,6 +1,12 @@
 package com.leaslink.utils;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.leaslink.models.FinancingContract;
 
 public class DatabaseUtil {
     private static final String DB_URL = "jdbc:sqlite:leaslink.db";
@@ -59,7 +65,9 @@ public class DatabaseUtil {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """;        // Create leases table
+        """;
+        
+        // Create leases table
         String createLeasesTable = """
             CREATE TABLE IF NOT EXISTS leases (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,7 +86,9 @@ public class DatabaseUtil {
                 FOREIGN KEY (motorcycle_id) REFERENCES motorcycles(id),
                 FOREIGN KEY (created_by) REFERENCES users(id)
             )
-        """;        // Create payments table
+        """;
+        
+        // Create payments table
         String createPaymentsTable = """
             CREATE TABLE IF NOT EXISTS payments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -106,7 +116,25 @@ public class DatabaseUtil {
                 FOREIGN KEY (lease_id) REFERENCES leases(id),
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )
-        """;        try (Statement stmt = connection.createStatement()) {
+        """;
+
+        // Create financing_contract table for the new contract functionality
+        String createFinancingContractTable = """
+            CREATE TABLE IF NOT EXISTS financing_contract (
+                contract_id TEXT PRIMARY KEY,
+                debtor_nik TEXT NOT NULL,
+                loan_amount DECIMAL(15,2) NOT NULL,
+                interest_rate DECIMAL(5,2) NOT NULL,
+                term INTEGER NOT NULL,
+                start_date DATE NOT NULL,
+                due_date DATE NOT NULL,
+                status TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """;
+
+        try (Statement stmt = connection.createStatement()) {
             // Create all tables
             stmt.execute(createUsersTable);
             stmt.execute(createUpdateTrigger);
@@ -114,6 +142,7 @@ public class DatabaseUtil {
             stmt.execute(createLeasesTable);
             stmt.execute(createPaymentsTable);
             stmt.execute(createLeaseAuditLogTable);
+            stmt.execute(createFinancingContractTable);
             
             // Create default users if not exists
             createDefaultUsers(stmt);
@@ -189,7 +218,9 @@ public class DatabaseUtil {
             System.out.println("Collector: collector@leaslink.com / collector");
             System.out.println("Customer: customer@leaslink.com / customer");
         }
-    }    private static void createSampleMotorcycles(Statement stmt) throws SQLException {
+    }
+
+    private static void createSampleMotorcycles(Statement stmt) throws SQLException {
         // Check if any motorcycles exist
         ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM motorcycles");
         if (rs.next() && rs.getInt(1) == 0) {
@@ -256,6 +287,110 @@ public class DatabaseUtil {
             
             System.out.println("Sample leases and payments created successfully.");
         }
+    }
+
+    // Contract financing methods
+    public static List<FinancingContract> getContractsByDebtorNik(String nik) {
+        List<FinancingContract> contracts = new ArrayList<>();
+        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
+                      "FROM financing_contract WHERE debtor_nik = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, nik);
+            ResultSet rs = stmt.executeQuery();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            while (rs.next()) {
+                String start = rs.getString("start_date");
+                String due = rs.getString("due_date");
+                Date startDate = sdf.parse(start);
+                Date dueDate = sdf.parse(due);
+
+                FinancingContract contract = new FinancingContract(
+                    rs.getString("contract_id"),
+                    rs.getString("debtor_nik"),
+                    rs.getDouble("loan_amount"),
+                    rs.getDouble("interest_rate"),
+                    rs.getInt("term"),
+                    startDate,
+                    dueDate,
+                    rs.getString("status")
+                );
+                contracts.add(contract);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return contracts;
+    }
+
+    public static List<FinancingContract> searchContractsByNik(String keyword) {
+        List<FinancingContract> contracts = new ArrayList<>();
+        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
+                      "FROM financing_contract WHERE debtor_nik LIKE ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + keyword + "%");
+            ResultSet rs = stmt.executeQuery();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            while (rs.next()) {
+                contracts.add(new FinancingContract(
+                    rs.getString("contract_id"),
+                    rs.getString("debtor_nik"),
+                    rs.getDouble("loan_amount"),
+                    rs.getDouble("interest_rate"),
+                    rs.getInt("term"),
+                    sdf.parse(rs.getString("start_date")),
+                    sdf.parse(rs.getString("due_date")),
+                    rs.getString("status")
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return contracts;
+    }
+    
+    public static List<FinancingContract> getAllContracts() {
+        List<FinancingContract> contracts = new ArrayList<>();
+        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
+                      "FROM financing_contract";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            while (rs.next()) {
+                contracts.add(new FinancingContract(
+                    rs.getString("contract_id"),
+                    rs.getString("debtor_nik"),
+                    rs.getDouble("loan_amount"),
+                    rs.getDouble("interest_rate"),
+                    rs.getInt("term"),
+                    sdf.parse(rs.getString("start_date")),
+                    sdf.parse(rs.getString("due_date")),
+                    rs.getString("status")
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return contracts;
     }
 
     public static void closeConnection() {
