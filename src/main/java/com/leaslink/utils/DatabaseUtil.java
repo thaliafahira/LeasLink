@@ -1,6 +1,12 @@
 package com.leaslink.utils;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.leaslink.models.FinancingContract;
 
 public class DatabaseUtil {
     private static final String DB_URL = "jdbc:sqlite:leaslink.db";
@@ -200,6 +206,110 @@ public class DatabaseUtil {
             
             System.out.println("Sample motorcycles created successfully.");
         }
+    }
+
+    // contract financing
+    public static List<FinancingContract> getContractsByDebtorNik(String nik) {
+        List<FinancingContract> contracts = new ArrayList<>();
+        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
+                    "FROM financing_contract WHERE debtor_nik = ?";
+
+        try (Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, nik);
+            ResultSet rs = stmt.executeQuery();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            while (rs.next()) {
+                String start = rs.getString("start_date");
+                String due = rs.getString("due_date");
+                Date startDate = sdf.parse(start);
+                Date dueDate = sdf.parse(due);
+
+                FinancingContract contract = new FinancingContract(
+                    rs.getString("contract_id"),
+                    rs.getString("debtor_nik"),
+                    rs.getDouble("loan_amount"),
+                    rs.getDouble("interest_rate"),
+                    rs.getInt("term"),
+                    startDate,
+                    dueDate,
+                    rs.getString("status")
+                );
+                contracts.add(contract);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return contracts;
+    }
+
+    public static List<FinancingContract> searchContractsByNik(String keyword) {
+        List<FinancingContract> contracts = new ArrayList<>();
+        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
+                    "FROM financing_contract WHERE debtor_nik LIKE ?";
+
+        try (Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, "%" + keyword + "%");
+            ResultSet rs = stmt.executeQuery();
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            while (rs.next()) {
+                contracts.add(new FinancingContract(
+                    rs.getString("contract_id"),
+                    rs.getString("debtor_nik"),
+                    rs.getDouble("loan_amount"),
+                    rs.getDouble("interest_rate"),
+                    rs.getInt("term"),
+                    sdf.parse(rs.getString("start_date")),
+                    sdf.parse(rs.getString("due_date")),
+                    rs.getString("status")
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return contracts;
+    }
+    
+    public static List<FinancingContract> getAllContracts() {
+        List<FinancingContract> contracts = new ArrayList<>();
+        String query = "SELECT contract_id, debtor_nik, loan_amount, interest_rate, term, start_date, due_date, status " +
+                    "FROM financing_contract";
+
+        try (Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery()) {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            while (rs.next()) {
+                contracts.add(new FinancingContract(
+                    rs.getString("contract_id"),
+                    rs.getString("debtor_nik"),
+                    rs.getDouble("loan_amount"),
+                    rs.getDouble("interest_rate"),
+                    rs.getInt("term"),
+                    sdf.parse(rs.getString("start_date")),
+                    sdf.parse(rs.getString("due_date")),
+                    rs.getString("status")
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return contracts;
     }
 
     public static void closeConnection() {

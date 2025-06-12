@@ -3,6 +3,7 @@ com\leaslink\views\common\AgingReceivablesPanel$1.class
 com\leaslink\models\User.class
 com\leaslink\controllers\AuthController.class
 com\leaslink\views\LoginForm$5.class
+com\leaslink\views\common\ContractFinancingPanel.class
 com\leaslink\controllers\AgingController.class
 com\leaslink\models\AgingData.class
 com\leaslink\views\admin\AdminDashboard$1.class
@@ -24,7 +25,9 @@ com\leaslink\views\collector\CollectorDashboard.class
 com\leaslink\views\common\AgingReceivablesPanel$ButtonEditor.class
 com\leaslink\views\LoginForm$4.class
 com\leaslink\views\RegisterForm.class
+com\leaslink\models\FinancingContract.class
 com\leaslink\utils\DatabaseUtil.class
+com\leaslink\controllers\ContractController.class
 com\leaslink\controllers\AgingController$AgingSummary.class
 com\leaslink\views\management\ManagementDashboard.class
 com\leaslink\views\LoginForm$2.class
